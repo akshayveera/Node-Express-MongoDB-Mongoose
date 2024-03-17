@@ -2,10 +2,12 @@
 const express = require('express');
 const app = express();
 const db = require("./db");
-
+require("dotenv").config();
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
+const port = process.env.PORT || 3000 
+// this means if PORT is present in env it will use that else it will use 3000
 
 // get
 // get method is used to send the data to frontend
@@ -36,6 +38,7 @@ app.use("/person", personRoutes);
 app.use("/menu", menuItemRoutes);
 
 
-app.listen(3000, ()=>{
+
+app.listen(port, ()=>{
     console.log("server is running on localhost port number 3000");
 });

@@ -2,9 +2,15 @@
 // import mongoose
 const mongoose = require("mongoose");
 
+require("dotenv").config();
+
 // start mongodb server and 
 // define mongodb connection url
-const mongoURL = "mongodb://127.0.0.1:27017/hotel";  // hotel is the name of the database in the mongodb
+
+// this is the local db
+// const mongoURL = process.env.MONGODB_LOCAL_URL;  // hotel is the name of the database in the mongodb
+// this is the hosted db on mongodb altas
+const mongoURL = process.env.MONGODB_HOSTED_URL;
 
 // set up mongodb connection
 mongoose.connect(mongoURL, {
