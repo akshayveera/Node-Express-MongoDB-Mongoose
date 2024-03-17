@@ -2,7 +2,6 @@
 const express = require('express');
 const app = express();
 const db = require("./db");
-const Person = require("./models/Person");
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
@@ -27,55 +26,14 @@ app.get('/about', (req, res)=>{
     res.send(data);
 })
 
-app.get('/services', (req, res)=>{
-    res.send("many services are available")
-})
 
-// post
-// post is used by backend to recieve data and update it in the db
-// or
-// post is used by frontend to give data to the backend
+// import  routes
+const personRoutes = require("./routes/personRoutes");
+const menuItemRoutes = require("./routes/menuItemRoutes");
 
-// POST route to add a person
-app.post("/person", async (req, res)=>{
-
-    try{
-        // assuming the request body contains the person data
-        const data = req.body;
-
-        console.log("data : -------------------------------------------", data);
-
-        // create a new Person document using mongoose model
-        const newPerson = new Person(data);
-
-        // save the person to the database
-        const response = await newPerson.save();
-
-        console.log("recieved data saved in db");
-        res.status(200).json(response);        
-
-    }catch(err){
-
-        console.log(err);
-        res.status(500).json({error : "Internal Server Error"});
-    }
-
-
-})
-
-// GET method to recieve all the persons data from db
-app.get("/person", async (req, res)=>{
-
-    try{
-        const data = await Person.find();
-        console.log("data fetched by client");
-        res.status(200).json(data);
-
-    }catch(err){
-        console.log(err);
-        res.status(500).json({error : "Internal Sever Error"});
-    }
-})
+// use those routes
+app.use("/person", personRoutes);
+app.use("/menu", menuItemRoutes);
 
 
 app.listen(3000, ()=>{
