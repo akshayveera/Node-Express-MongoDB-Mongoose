@@ -31,6 +31,6 @@ const menuItemSchema = new mongoose.Schema(
         }
     }
 )
-console.log("menuitem is executed")
+console.log("menuitem is executed");
 const MenuItem = mongoose.model("MenuItem", menuItemSchema);
 module.exports = MenuItem;

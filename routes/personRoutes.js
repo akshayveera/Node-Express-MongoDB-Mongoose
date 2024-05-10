@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const Person = require("../models/Person");
+const {jwtAuthMiddleware, generateToken} = require("../jwt");
 
 // post
 // post is used by backend to recieve data and update it in the db
@@ -10,22 +11,31 @@ const Person = require("../models/Person");
 // post is used by frontend to give data to the backend
 
 // POST route to add a person
-router.post("/", async (req, res)=>{
+router.post("/signup", async (req, res)=>{
 
     try{
         // assuming the request body contains the person data
         const data = req.body;
 
-        console.log("data : -------------------------------------------", data);
+        // console.log("data : -------------------------------------------", data);
 
         // create a new Person document using mongoose model
-        const newPerson = new Person(data);
-
+        const newPerson = new Person(data);        
+        
         // save the person to the database
         const response = await newPerson.save();
 
-        console.log("recieved data saved in db");
-        res.status(200).json(response);        
+        // generating the token
+        const payload = {
+            id : response.id,
+            username : response.username
+        }
+
+        const token = generateToken(payload);
+        console.log("Token is : ", token);
+        
+        // console.log("received data saved in db");
+        res.status(200).json({response : response, token : token});        
 
     }catch(err){
 
@@ -34,9 +44,39 @@ router.post("/", async (req, res)=>{
     }
 })
 
+// login
+router.post("/login", async(req, res)=>{
+    try{
+        // extract username and password
+        const {username, password} = req.body;
+
+        // find the user by username
+        const user = await Person.findOne({username : username});
+
+        // check of the user exist and compare password
+        if( !user || !(await user.comparePassword(password))){
+            return res.status(401).json({error : "Invalid username and password"});
+        }
+
+        // generate token
+        const payload = {
+            id : user.id,
+            username : user.username
+        }
+
+        const token = generateToken(payload);
+
+        res.json({token : token});
+
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error : "Internal server error"});
+    }
+})
+
 
 // GET method to recieve all the persons data from db
-router.get("/", async (req, res)=>{
+router.get("/", jwtAuthMiddleware, async (req, res)=>{
 
     try{
         const data = await Person.find();
@@ -46,6 +86,22 @@ router.get("/", async (req, res)=>{
     }catch(err){
         console.log(err);
         res.status(500).json({error : "Internal Sever Error"});
+    } 
+})
+
+// profile of person
+router.get("/profile", jwtAuthMiddleware, async (req, res)=>{
+
+    try{
+        const userData = req.user;
+
+        const userID = userData.id;
+        const user = await Person.findById(userID);
+
+        res.status(200).json({user});
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error : "Intenal server error"})
     }
 })
 

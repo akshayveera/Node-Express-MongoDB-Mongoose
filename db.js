@@ -8,12 +8,16 @@ require("dotenv").config();
 // define mongodb connection url
 
 // this is the local db
-// const mongoURL = process.env.MONGODB_LOCAL_URL;  // hotel is the name of the database in the mongodb
+const mongoURL = process.env.MONGODB_LOCAL_URL;  // hotel is the name of the database in the mongodb
 // this is the hosted db on mongodb altas
-const mongoURL = process.env.MONGODB_HOSTED_URL;
+// const mongoURL = process.env.MONGODB_HOSTED_URL;
 
 // set up mongodb connection
-mongoose.connect(mongoURL)
+mongoose.connect(mongoURL);
+// {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// }
 
 // get the default connection
 // mongoose maintains a default connection object representing the mongodb connection
